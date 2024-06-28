@@ -9,7 +9,7 @@
 #include <EEPROM.h>
 #include <Servo.h>
 
-//declaracio de constantes
+//declaracion de constantes
 
 
 //Variables a utilizar
@@ -42,6 +42,7 @@ uint8_t angleServoEE = 0;
 uint8_t state = 0;            // Variable donde guardaremos estado del control del robot
 unsigned int totalMoves = 0;  // Variable donde guardamos el total de movimientos del robot
 unsigned int index = 0;       // Indice de memoria del Robot
+bool recordFlag = false;
 
 Servo servoBase;
 Servo servoJ1;
@@ -92,6 +93,8 @@ void loop() {
     digitalWrite(pinLedGreen,LOW);
   }else if(!digitalRead(pinButtomWrite) && !digitalRead(pinButtomSave)){
     state = 3;
+    i = 0;
+    recordFlag = true;
     digitalWrite(pinLedRed,HIGH);
     digitalWrite(pinLedGreen,HIGH);
   }
@@ -131,6 +134,37 @@ void loop() {
       servoJ2.write(angleServoJ2);
       servoEE.write(angleServoEE);
       delay(10);
+      break;
+
+    case 3:
+      while(recordFlag){
+        angleServoBase = map(analogRead(pinPotBase),0,1024,0,180);
+        angleServoJ1 = map(analogRead(pinPotJ1),0,1024,0,180);
+        angleServoJ2 = map(analogRead(pinPotJ2),0,1024,0,180);
+        angleServoEE = map(analogRead(pinPotEE),0,1024,0,180);
+        servoBase.write(angleServoBase);
+        servoJ1.write(angleServoJ1);
+        servoJ2.write(angleServoJ2);
+        servoEE.write(angleServoEE);
+        if(!digitalRead(pinButtomSave)){
+          EEPROM.write(i,angleServoBase);
+          EEPROM.write(i+1,angleServoBase);
+          EEPROM.write(i+2,angleServoBase);
+          EEPROM.write(i+3,angleServoBase);
+          i += 4;
+          if(i >= 1020){
+            //Serial.prinln("[-] ERROR -  Memoria llena");
+            recordFlag = false;
+          }
+        }
+        if(!digitalWrite(pinButtomStop)){
+          recordFlag = false;
+        }
+      }
+      totalMoves = i;
+      EEPROM.put(1022,totalMoves);
+      i = 0;
+      state = 0;
       break;
   }
 
