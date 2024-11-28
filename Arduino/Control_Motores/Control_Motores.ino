@@ -54,7 +54,7 @@ void loop() {
         stringV = message.substring(0,pos1);
         stringW = message.substring(pos1+1);
         V = stringV.toFloat();
-        W = stringV.toFloat();
+        W = stringW.toFloat();
         Vr = V/r + (W*l)/(2*r);
         Vl = V/r - (W*l)/(2*r);
     }
