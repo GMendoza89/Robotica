@@ -24,6 +24,8 @@ uint8_t motor_2_EN = 5;
 uint8_t motor_3_EN = 10;
 uint8_t motor_4_EN = 11;
 
+uint8_t pwm_vr = 0;
+uint8_t pwm_vl = 0;
 //Caracteristicas del Robot
 double l = 0.16;  // longitud entre los ejes
 double r = 0.06; // Radio de las llantas
@@ -101,23 +103,26 @@ void loop() {
         Serial.println(" Movimiento avanzar");
     }
     if(Vr > 255 || Vr < -255){
-        Vr = 255;
-    }
-    if(Vr < 0){
-        Vr *= (-1);
+        pwm_vr = 255;
+    }else if(Vr < 0){
+        pwm_vr = uint8_t((-1)*Vr);
+    }else{
+        pwm_vr = uint8_t(Vr);
     }
     if(Vl > 255 || Vl < -255){
-        Vl = 255;
-    }
-    if(Vl < 0){
-        Vl *= (-1);
+        pwm_vl = 255;
+    }else if(Vl < 0){
+        pwm_vl = uint8_t((-1)*Vl);;
+    }else{
+        pwm_vl = uint8_t(Vl);
+
     }
 
 
-    analogWrite(motor_1_EN,uint8_t(Vl));
-    analogWrite(motor_4_EN,uint8_t(Vr));
-    analogWrite(motor_3_EN,uint8_t(Vr));
-    analogWrite(motor_2_EN,uint8_t(Vl));
+    analogWrite(motor_1_EN,pwm_vl);
+    analogWrite(motor_4_EN,pwm_vr);
+    analogWrite(motor_3_EN,pwm_vr);
+    analogWrite(motor_2_EN,pwm_vl);
     // descomentar durante pruebas
     Serial.print("PWM M1: ");
     Serial.print(Vr);
